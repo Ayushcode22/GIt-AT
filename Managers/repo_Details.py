@@ -1,8 +1,27 @@
 import aiohttp
 from aiohttp_client_cache import CachedSession, SQLiteBackend
+
+from Models.Request import Request
 async def repo_Details_Handler(username,reponame):
+
+    req = Request(f"https://api.github.com/repos/{username}/{reponame}")
+    response,statusCode = await req._api_call()
+    if(statusCode==200):
+        JsonData = {}
+        JsonData['Name'] = response['name']
+        JsonData['Description'] = response['description']
+        JsonData['Star Count'] = response['stargazers_count']
+        JsonData['Fork Count'] = response['forks_count']
+        JsonData['Language'] = response['language']
+        print(JsonData)
+        return JsonData,statusCode
+    else:
+        return response,statusCode
+
+
+
     # print("ENTERED ",username,time.ctime())
-    JsonData = {}
+    
     async with CachedSession(cache=SQLiteBackend('demo_cache')) as session:
         url1 = f"https://api.github.com/repos/{username}/{reponame}"
         async with session.get(url1) as response1:

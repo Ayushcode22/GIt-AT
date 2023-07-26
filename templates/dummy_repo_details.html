@@ -17,7 +17,7 @@
                 <p class="card-text">Language: {{ dict.Language }}</p>
                 <h6>Contributors:</h6>
                 <ul class="list-group">
-                    {% for contributor in dict.Contributors %}
+                    {% for contributor in dict.List_contributors %}
                     <li class="list-group-item">
                         <strong>{{ contributor.keys()|first }}:</strong>
                         <span>{{ contributor.values()|first }}</span>

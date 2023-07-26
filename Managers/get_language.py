@@ -1,18 +1,13 @@
-import aiohttp
-from aiohttp_client_cache import CachedSession, SQLiteBackend
-
+from Models.Request import Request
 async def get_User_Lang(username):
-    async with CachedSession(cache=SQLiteBackend('demo_cache')) as session:
-        url = f'https://api.github.com/users/{username}/repos'
-        async with session.get(url) as response:
-            if(response.status==200):
-                data = await response.json()
-                JsonData={}
-                languages = list(set([repo['language'] for repo in data if repo['language'] ]))
-                JsonData['Languages'] = languages
-                JsonData['Status Code'] = "200"
-                return JsonData
-            else:
-                return {
-                    "Message":"Error 404","Status Code":"404"
-                }
+
+    req = Request(f'https://api.github.com/users/{username}/repos')
+    response,statusCode = await req._api_call()
+    if(statusCode==200):
+        JsonData={}
+        languages = list(set([repo['language'] for repo in response if repo['language'] ]))
+        JsonData['Languages'] = languages
+        JsonData['Status Code'] = "200"
+        return JsonData,statusCode
+    else:
+        return response,statusCode
