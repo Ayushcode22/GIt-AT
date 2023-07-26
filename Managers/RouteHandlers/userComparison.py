@@ -1,9 +1,5 @@
 import asyncio
-from Managers.get_language import get_User_Lang
-from Managers.RouteHandlers.get_user_details import userDetailsHandler
-from Managers.most_starred import mostStarredRepoHandler
-
-
+from ..User import User
 
 
 async def userComparisonHandler(request):
@@ -14,15 +10,17 @@ async def userComparisonHandler(request):
     except:
         return {"Error Message ":" Please use 'user1' and 'user2' for passing username"},404
 
-
-    response1 =asyncio.get_event_loop().create_task( userDetailsHandler(user1))
-    response2 =asyncio.get_event_loop().create_task( userDetailsHandler(user2))
+    user1 = User(user1)
+    response1 =asyncio.get_event_loop().create_task( user1.userDetailsHandler())
+    user2 = User(user2)
+    response2 =asyncio.get_event_loop().create_task( user2.userDetailsHandler())
     
-    user_1_mostStarred = asyncio.get_event_loop().create_task(mostStarredRepoHandler(user1)) 
-    user_2_mostStarred = asyncio.get_event_loop().create_task(mostStarredRepoHandler(user2))
 
-    lang_u1 = asyncio.get_event_loop().create_task(get_User_Lang(user1))
-    lang_u2 = asyncio.get_event_loop().create_task(get_User_Lang(user2))
+    user_1_mostStarred = asyncio.get_event_loop().create_task(user1.mostStarredRepoHandler()) 
+    user_2_mostStarred = asyncio.get_event_loop().create_task(user2.mostStarredRepoHandler())
+
+    lang_u1 = asyncio.get_event_loop().create_task(user1.get_User_Lang())
+    lang_u2 = asyncio.get_event_loop().create_task(user2.get_User_Lang())
 
     group = await asyncio.gather(*[response1,response2,user_1_mostStarred,user_2_mostStarred,lang_u1,lang_u2],return_exceptions=True)
     
@@ -53,5 +51,15 @@ async def userComparisonHandler(request):
         JsonResp['user1']=resp1
         JsonResp['user2']=resp2
         return JsonResp,status1
-    else:
+    elif(status1!= 200):
         return resp1,status1
+    elif(status2!= 200):
+        return resp2,status2
+    elif(status3!= 200):
+        return resp3,status3
+    elif(status4!= 200):
+        return resp4,status4
+    elif(status5!= 200):
+        return resp5,status5
+    else :
+        return resp6,status6

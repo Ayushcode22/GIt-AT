@@ -1,16 +1,13 @@
 from sanic import Sanic, Blueprint
 from sanic.response import text,json
 from sanic_ext import render
-from textwrap import dedent
 import sys
-from Managers.RouteHandlers.get_user_details import userDetailsHandler
 from Managers.RouteHandlers.repoComparison import repoComparisonHandler
-from Managers.RouteHandlers.repoDetailsHandler import repoDetailsHandler
 from Managers.RouteHandlers.userComparison import userComparisonHandler
 sys.path.append('/Users/ayush.tripude/Desktop/Github Analytics tool')
-from Managers.RouteHandlers.repo_List import repo_List_Handler
-from Managers.RouteHandlers.sort_repos import handle_sorting
-import asyncio
+
+from Managers.User import User
+from Managers.Repository import Repository
 
 bp = Blueprint("Ayush")
 
@@ -41,7 +38,8 @@ async def get_help(request):
 # GET USER DETAILS
 @bp.get('/user/<username:str>')
 async def get_user_details(request,username):
-    response, statusCode = await userDetailsHandler(username)
+    user = User(username)
+    response, statusCode = await user.userDetailsHandler()
     if(statusCode==200):
         return await render('dummy_user_detail.html',context={"dict":response},status=200)
     else:
@@ -52,7 +50,8 @@ async def get_user_details(request,username):
 #GET REPOSITORY DETAILS FOR A PARTICULAR USER
 @bp.get('/user/<username:str>/<reponame:str>')
 async def get_repo_details(request,username,reponame):
-    response,statusCode =  await repoDetailsHandler(username,reponame)
+    repo = Repository(username,reponame)
+    response,statusCode =  await repo.repoDetailsHandler()
     if(statusCode==200):
         return await render ('dummy_repo_details.html',context={"dict":response},status=200)
     else:
@@ -62,13 +61,15 @@ async def get_repo_details(request,username,reponame):
 #GET ALL REPOSITORIES FOR A USER
 @bp.get('/user/<username:str>/repos')
 async def get_user_repos(request,username):
-    response = await repo_List_Handler(username)
+    user = User(username)
+    response = await user.repo_List_Handler()
     return await render("dummy_repo_list.html",context={"names":response},status=200)
 
 
 @bp.get('/user/<username:str>/sort')
 async def sort_Repos(request,username):
-    response,statusCode = await handle_sorting(request,username)
+    user = User(username)
+    response,statusCode = await user.handle_sorting(request)
     if(statusCode==200):
         return await render("dummy_sort.html",context={"List":response['List']},status=200)
     else:

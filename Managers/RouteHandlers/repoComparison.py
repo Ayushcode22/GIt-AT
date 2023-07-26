@@ -1,6 +1,5 @@
 import asyncio
-
-from Managers.RouteHandlers.repoDetailsHandler import repoDetailsHandler
+from ..Repository import Repository
 async def repoComparisonHandler(request):
     
     try:
@@ -12,9 +11,10 @@ async def repoComparisonHandler(request):
     except:
         return {"Error Message ":" Please use 'user1' and 'user2' for passing username and 'repo1' and 'repo2' for passing repository name"},404
     
-    repoDetails1 = asyncio.get_event_loop().create_task( repoDetailsHandler(user1,repo1))
-
-    repoDetails2 = asyncio.get_event_loop().create_task(repoDetailsHandler(user2,repo2))
+    repo1 = Repository(user1,repo1)
+    repoDetails1 = asyncio.get_event_loop().create_task( repo1.repoDetailsHandler())
+    repo2 = Repository(user2,repo2)
+    repoDetails2 = asyncio.get_event_loop().create_task(repo2.repoDetailsHandler())
 
     group = await asyncio.gather(*[repoDetails1,repoDetails2],return_exceptions=True)
     print(group)

@@ -8,12 +8,13 @@ class Request :
     
     async def _api_call(self):
         print(self.url)
-        async with CachedSession(cache=SQLiteBackend('demo_cache')) as session:
+        async with CachedSession(cache=SQLiteBackend(cache_name='demo_cache',expire_after=60*60)) as session:
             url2 = self.url
             timeout = aiohttp.ClientTimeout(total=60*3)
             try:
                 async with session.get(url2 , timeout=timeout) as response2:
                     data = await response2.json()
+                    print(f"{response2.from_cache} Cache Used")
                     if(response2.status==200):
                         return data,response2.status
                     else:
